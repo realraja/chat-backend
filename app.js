@@ -14,6 +14,8 @@ import { NEW_MESSAGE } from "./constants/events.js";
 // import { getSockets } from "./utils/socketHelper.js";
 import { v4 as uuid } from "uuid";
 import { Message } from "./models/message.js";
+import cors from 'cors'; 
+import { v2 as cloudinary } from "cloudinary";
 
 
 const getSockets = (users = []) =>{
@@ -33,7 +35,16 @@ config({
 });
 connectDB();
 app.use(cookieParser());
+app.use(cors({
+  origin: ["http://localhost:3000",process.env.CLIENT_URL],
+  credentials: true,
+}));
 
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_KEY,
+  api_secret: process.env.CLOUD_SECRET
+})
 
 //api routes is here
 app.get("/", (req, res) => {
@@ -104,7 +115,7 @@ io.on("connection", (socket) => {
 //error handlers
 app.use(errorMiddleware);
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 server.listen(port, () => {
   console.log("server listening on port " + port);
 });

@@ -1,6 +1,7 @@
 import { tryCatch } from "../middleware/tryCatch.js";
 import { Chat } from "../models/chat.js";
 import { User } from "../models/user.js";
+import { uploadFiles } from "../utils/cloudinaryUpload.js";
 import { errorHandler } from "../utils/handleError.js";
 import { sendToken } from "../utils/setCookies.js";
 
@@ -15,9 +16,10 @@ let dateArray = [
 
 export const Register = tryCatch(async (req, res, next) => {
   const { name, username, password } = req.body;
-  const avatar = "okji";
+  const file = req.file;
+  // console.log('ye data =====>',name,username,password,file);
 
-  if (!username || !password || !name || !avatar)
+  if (!username || !password || !name || !file)
     return next(new errorHandler("Fill all the fields"));
 
   // const checkUser = await User.findOne({ username });
@@ -25,6 +27,9 @@ export const Register = tryCatch(async (req, res, next) => {
   // if (checkUser) {
   //   return next(new errorHandler("User Already Registered", 400));
   // }
+
+  const result = await uploadFiles([file])
+  const avatar = result[0].url;
 
   const user = await User.create({
     name,
