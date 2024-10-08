@@ -36,7 +36,7 @@ config({
 connectDB();
 app.use(cookieParser());
 app.use(cors({
-  origin: ["http://localhost:3000",process.env.CLIENT_URL],
+  origin: [process.env.LOCAL_CLIENT_URL,process.env.CLIENT_URL],
   credentials: true,
 }));
 
