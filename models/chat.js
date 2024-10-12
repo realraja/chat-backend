@@ -26,7 +26,8 @@ const chatSchema = new Schema({
     }],
     members:[{
         type: Types.ObjectId,
-        ref: "User"
+        ref: "User",
+        unique: true
     }],
     block_members:[{
         type: Types.ObjectId,
