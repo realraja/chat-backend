@@ -38,11 +38,39 @@ export const CreateGroup = tryCatch(async (req, res, next) => {
     .status(200)
     .json({ success: true, message: "Group Created successfully" });
 });
+export const NewChat = tryCatch(async (req, res, next) => {
+  const { member } = req.body;
+  // console.log( members);
+
+  const allMembers = [member, req.id];
+
+  const newChat = await Chat.create({
+      name: `Chat ${req.id}-${member}`,
+    members: allMembers,
+    createdDate: dateArray,
+  });
+
+  emitEvent(req, ALERT, allMembers, `Welcome to New chat`);
+  emitEvent(req, REFETCH_CHATS, member);
+
+  return res
+    .status(200)
+    .json({ success: true, message: "Chat Created successfully",chat:newChat });
+});
 
 export const GetMyChats = tryCatch(async(req, res, next)=>{
     const chat  = await Chat.find({members:req.id}).populate('members','name avatar');
 
-    return res.status(200).json({ success: true, message:'chat fetched successfully',chat });
+    const modifiedChat = chat.map(({_id,name,imgUrl,members,updatedAt,groupChat})=>{
+      if(!groupChat){
+        const otherMember = members.find(member=>member._id !== req.id);
+        return {_id,name:otherMember.name,imgUrl:[otherMember.avatar],members,updatedAt,groupChat}
+      }else{
+        return {_id,name,imgUrl,members,updatedAt,groupChat}
+      }
+    })
+
+    return res.status(200).json({ success: true, message:'chat fetched successfully',chat:modifiedChat});
 })
 
 export const GetMyGroups = tryCatch(async(req, res, next)=>{

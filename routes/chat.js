@@ -9,6 +9,7 @@ import {
   GetMyChats,
   GetMyGroups,
   LeaveGroup,
+  NewChat,
   RemoveAdmin,
   RemoveMembers,
   RenameGroup,
@@ -45,6 +46,7 @@ app.get("/getallchats", async (req, res) => {
 app.use(singleAvatar)
 
 app.post("/new", isAuthenticated, CreateGroup);
+app.post("/new/chat", isAuthenticated, NewChat);
 app.get("/my", isAuthenticated, GetMyChats);
 app.get("/my/group", isAuthenticated, GetMyGroups);
 app.put("/admin/add", isAuthenticated, AddAdmin);
