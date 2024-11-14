@@ -95,9 +95,36 @@ export const FindUser = tryCatch(async(req,res,next)=>{
 export const Search = tryCatch(async(req,res,next)=>{
   const {name= ''} = req.query;
   // const user = await User.findById(userId,"name");
-  const chat = await Chat.find({groupChat:true,members:req.id,name:{$regex:name,$options:'i'}}).populate("creator","name avatar");
+  const chat = await Chat.find({groupChat:true,name:{$regex:name,$options:'i'}}).populate("creator","name avatar");
 
   const findedUsers = await User.find({name:{$regex:name,$options:'i'}});
 
-  return res.json({success:true,message:'Chat found successfully',groups:chat,users:findedUsers});
+
+  const modifiedUsers = findedUsers.map(async({_id,name,username,avatar,updatedAt})=>{
+    const userChat = await Chat.findOne({groupChat:false,
+      $and:[
+          {members: req.id},
+          {members: _id},
+      ]
+    })
+    // const otherMember = members.find(member=>member._id !== req.id);
+    if(userChat){
+      return {_id:userChat._id,name,avatar,username,updatedAt,isFriend:true}
+    }else{
+      // console.log(userChat,_id,name,avatar,username,updatedAt)
+      return {_id,name,avatar,username,updatedAt,isFriend:false}
+    }
+  })
+
+ const users = await Promise.all(modifiedUsers)
+
+  return res.json({success:true,message:'Chat found successfully',groups:chat,users:users});
 });
+
+
+// const Chats = await Chat.findOne({
+//   $and:[
+//       {members: req.id},
+//       {sender:chatId,receiver:req.id},
+//   ]
+// })

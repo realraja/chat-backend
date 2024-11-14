@@ -14,5 +14,5 @@ export const sendToken = (res,user,code,message) =>{
     
 const token = jwt.sign({id:user._id},process.env.JWT_SECRET);
 
-return res.status(code).cookie("Chat_token",token,CookieOptions).json({success:true,message:message})
+return res.status(code).cookie("Chat_token",token,CookieOptions).json({success:true,message:message,user})
 }
