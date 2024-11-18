@@ -74,7 +74,7 @@ export const AcceptJoinRequest = tryCatch(async(req,res,next) => {
 
 
 export const AllNotifications = tryCatch(async (req,res,next) => {
-    const request = await Request.find({receiverCreator:req.id}).populate("sender","name avatar");
+    const request = await Request.find({receiverCreator:req.id}).populate("sender","name avatar username").populate("receiver","name");
     return res.status(200).json({success:true,message:'Request fetched successfully',request:request});
 })
 
