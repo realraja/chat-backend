@@ -63,7 +63,8 @@ export const GetMyChats = tryCatch(async(req, res, next)=>{
 
     const modifiedChat = chat.map(({_id,name,imgUrl,members,updatedAt,groupChat})=>{
       if(!groupChat){
-        const otherMember = members.find(member=>member._id !== req.id);
+        const otherMember = members.find(member=>member._id.toString() !== req.id.toString());
+        // console.log(members,otherMember,req.id)
         return {_id,name:otherMember.name,imgUrl:[otherMember.avatar],members,updatedAt,groupChat}
       }else{
         return {_id,name,imgUrl,members,updatedAt,groupChat}
@@ -248,7 +249,7 @@ export const SendAttachment = tryCatch(async(req, res, next)=>{
 
 export const GetChatDetails = tryCatch(async (req,res,next) => {
   if(req.query.populate==='true'){
-    const chat = await Chat.findById(req.params.id).populate("members", "name avatar");
+    const chat = await Chat.findById(req.params.id).populate("members", "name avatar username");
     if(!chat) return next(new errorHandler('chat not found',403));
 
     return res.status(200).json({

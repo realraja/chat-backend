@@ -10,33 +10,41 @@ import requestRoutes from "./routes/request.js";
 import adminRoutes from "./routes/admin.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
-import { NEW_MESSAGE } from "./constants/events.js";
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/events.js";
 // import { getSockets } from "./utils/socketHelper.js";
 import { v4 as uuid } from "uuid";
 import { Message } from "./models/message.js";
 import cors from 'cors'; 
 import { v2 as cloudinary } from "cloudinary";
+import { SocketAuthenticator } from "./middleware/auth.js";
 
 
-const getSockets = (users = []) =>{
-    const sockets = users.map((user)=> userSocketIDs.get(user._id.toString()))
 
-    return sockets;
-}
 
-const app = express();
-const server = createServer(app);
-const io = new Server(server, {});
-export const userSocketIDs = new Map();
+
+
+
+
 
 
 config({
   path: "./.env",
 });
+
+
+const app = express();
+const server = createServer(app);
+const io = new Server(server, {cors: {
+  origin: [process.env.LOCAL_CLIENT_URL,process.env.CLIENT_URL],
+  credentials: true,
+}});
+
+
 connectDB();
 app.use(cookieParser());
 app.use(cors({
   origin: [process.env.LOCAL_CLIENT_URL,process.env.CLIENT_URL],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 }));
 
@@ -56,19 +64,33 @@ app.use("/v1/api/request", requestRoutes);
 app.use("/v1/api/admin", adminRoutes);
 
 //socket.io is here
+export const userSocketIDs = new Map();
 
-io.use((socket,next)=>{});
+
+
+
+
+io.use((socket,next)=>{
+  cookieParser()(socket.request,socket.request.res,async(err)=>{
+    await SocketAuthenticator(err,socket,next);
+  })
+});
+
+const getSockets = (users = []) =>{
+  // console.log(users[2]._id);
+  const sockets = users.map((user)=> userSocketIDs.get(user._id.toString()))
+
+  return sockets;
+}
 
 io.on("connection", (socket) => {
     
     
-    const user = {
-        _id: "akjfdkajdk",
-        name: "mango banana",
-    };
+    const user = socket.user;
+    // console.log(user);
     
     userSocketIDs.set(user._id.toString(), socket.id);
-    console.log(userSocketIDs);
+    // console.log(userSocketIDs);
 
   socket.on(NEW_MESSAGE, async({ chatId, members, message }) => {
     const realTimeMessage = {
@@ -87,13 +109,14 @@ io.on("connection", (socket) => {
         chatId: chatId,
         sender: user._id
     }
-
+// console.log(members)
 
     const membersSocket = getSockets(members);
+    console.log(membersSocket)
     io.to(membersSocket).emit(NEW_MESSAGE,{chatId, message:realTimeMessage});
-    io.to(membersSocket).emit(NEW_MESSAGE,{chatId});
+    io.to(membersSocket).emit(NEW_MESSAGE_ALERT,{chatId});
 
-    // console.log("meesage realtime", realTimeMessage);
+    console.log("meesage realtime", realTimeMessage);
     try {
         await Message.create(messageForDb);
     } catch (error) {
