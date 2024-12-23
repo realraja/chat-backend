@@ -17,7 +17,7 @@ import {
   getMessage,
 } from "../controllers/chat.js";
 import { isAuthenticated } from "../middleware/auth.js";
-import { attachmentMulter, singleAvatar } from "../middleware/multer.js";
+import { attachmentMulter } from "../middleware/multer.js";
 import { tryCatch } from "../middleware/tryCatch.js";
 import { Message } from "../models/message.js";
 
@@ -43,7 +43,7 @@ app.get("/getallchats", async (req, res) => {
   }
 });
 
-app.use(singleAvatar)
+// app.use(singleAvatar)
 
 app.post("/new", isAuthenticated, CreateGroup);
 app.post("/new/chat", isAuthenticated, NewChat);

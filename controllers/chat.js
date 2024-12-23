@@ -3,6 +3,7 @@ import { tryCatch } from "../middleware/tryCatch.js";
 import { Chat } from "../models/chat.js";
 import { Message } from "../models/message.js";
 import { User } from "../models/user.js";
+import { uploadFiles } from "../utils/cloudinaryUpload.js";
 import { emitEvent } from "../utils/emit.js";
 import { errorHandler } from "../utils/handleError.js";
 
@@ -217,21 +218,24 @@ export const LeaveGroup = tryCatch(async(req, res, next)=>{
 export const SendAttachment = tryCatch(async(req, res, next)=>{
 
   const {chatId} = req.body;
+  // console.log(chatId);
+  const files = req.files || [];
+if (!Array.isArray(files) || files.length < 1) {
+  return next(new errorHandler('Please provide files', 404));
+}
+// upload files here
+// console.log(files);
+const attachments = await uploadFiles(files);
+// console.log(attachments);
 
   const [chat, user] = await Promise.all([
     Chat.findById(chatId),
     User.findById(req.id,"name")
-  ]);
-
+  ]);  
+  if (!chat) return next(new errorHandler('Chat not found', 404));
+  if (!user) return next(new errorHandler('User not found', 404));
   
-  if(!chat) return next(new errorHandler('Chat not found',404));
-  
-  const files = req.files || [];
 
-  if(files.length < 1) return next(new errorHandler('Please provide files',404));
-
-  // upload files here
-  const attachments = [];
 
 
   const messageForRealtime = {content:'',attachments,sender:{_id:user._id,name:user.name},chatId};
