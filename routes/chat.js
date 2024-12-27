@@ -43,7 +43,7 @@ app.get("/getallchats", async (req, res) => {
   }
 });
 
-// app.use(singleAvatar)
+app.use(attachmentMulter)
 
 app.post("/new", isAuthenticated, CreateGroup);
 app.post("/new/chat", isAuthenticated, NewChat);
@@ -77,7 +77,7 @@ app.get("/getallmessages",tryCatch(async (req, res, next) => {
 
 
 app.use(isAuthenticated);
-app.post("/message", attachmentMulter, SendAttachment); // send attachment test it after okay
+app.post("/message", SendAttachment); // send attachment test it after okay
 
 app.get("/message/:id", getMessage);
 

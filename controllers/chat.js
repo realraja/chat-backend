@@ -41,9 +41,14 @@ export const CreateGroup = tryCatch(async (req, res, next) => {
 });
 export const NewChat = tryCatch(async (req, res, next) => {
   const { member } = req.body;
-  // console.log( members);
+  if (!member) {
+    return next(new errorHandler('Please provide member',404));
+  }
+
 
   const allMembers = [member, req.id];
+
+  console.log(allMembers)
 
   const newChat = await Chat.create({
       name: `Chat ${req.id}-${member}`,
@@ -61,8 +66,10 @@ export const NewChat = tryCatch(async (req, res, next) => {
 
 export const GetMyChats = tryCatch(async(req, res, next)=>{
     const chat  = await Chat.find({members:req.id}).populate('members','name avatar');
+    
+    console.log(chat)
 
-    const modifiedChat = chat.map(({_id,name,imgUrl,members,updatedAt,groupChat})=>{
+    const modifiedChat = chat.map(({_id,name='',imgUrl,members,updatedAt,groupChat})=>{
       if(!groupChat){
         const otherMember = members.find(member=>member._id.toString() !== req.id.toString());
         // console.log(members,otherMember,req.id)
