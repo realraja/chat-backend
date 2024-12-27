@@ -67,6 +67,7 @@ app.use("/v1/api/admin", adminRoutes);
 
 //socket.io is here
 
+export const userSocketIDs = new Map();
 
 
 
