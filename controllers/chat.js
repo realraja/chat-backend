@@ -1,4 +1,4 @@
-import { ALERT, NEW_ATTACHMENT, NEW_MESSAGE_ALERT, REFETCH_CHATS } from "../constants/events.js";
+import { ALERT, NEW_MESSAGE, NEW_MESSAGE_ALERT, REFETCH_CHATS } from "../constants/events.js";
 import { tryCatch } from "../middleware/tryCatch.js";
 import { Chat } from "../models/chat.js";
 import { Message } from "../models/message.js";
@@ -48,7 +48,7 @@ export const NewChat = tryCatch(async (req, res, next) => {
 
   const allMembers = [member, req.id];
 
-  console.log(allMembers)
+  // console.log(allMembers)
 
   const newChat = await Chat.create({
       name: `Chat ${req.id}-${member}`,
@@ -67,7 +67,7 @@ export const NewChat = tryCatch(async (req, res, next) => {
 export const GetMyChats = tryCatch(async(req, res, next)=>{
     const chat  = await Chat.find({members:req.id}).populate('members','name avatar');
     
-    console.log(chat)
+    // console.log(chat)
 
     const modifiedChat = chat.map(({_id,name='',imgUrl,members,updatedAt,groupChat})=>{
       if(!groupChat){
@@ -249,7 +249,7 @@ const attachments = await uploadFiles(files);
   const messageForDB = {content:'',attachments,sender:user._id,chatId};
   const message = await Message.create(messageForDB);
 
-  emitEvent(req,NEW_ATTACHMENT,chat.members,{message: messageForRealtime,chatId})
+  emitEvent(req,NEW_MESSAGE,chat.members,{message: messageForRealtime,chatId})
   emitEvent(req,NEW_MESSAGE_ALERT,chat.members,{chatId})
 
 

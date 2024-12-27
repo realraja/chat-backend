@@ -11,12 +11,12 @@ import adminRoutes from "./routes/admin.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
 import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/events.js";
-// import { getSockets } from "./utils/socketHelper.js";
 import { v4 as uuid } from "uuid";
 import { Message } from "./models/message.js";
 import cors from 'cors'; 
 import { v2 as cloudinary } from "cloudinary";
 import { SocketAuthenticator } from "./middleware/auth.js";
+import { getSockets } from "./utils/socketHelper.js";
 
 
 
@@ -38,6 +38,8 @@ const io = new Server(server, {cors: {
   origin: [process.env.LOCAL_CLIENT_URL,process.env.CLIENT_URL],
   credentials: true,
 }});
+
+app.set("io",io);
 
 
 connectDB();
@@ -64,7 +66,6 @@ app.use("/v1/api/request", requestRoutes);
 app.use("/v1/api/admin", adminRoutes);
 
 //socket.io is here
-export const userSocketIDs = new Map();
 
 
 
@@ -76,12 +77,7 @@ io.use((socket,next)=>{
   })
 });
 
-const getSockets = (users = []) =>{
-  // console.log(users[2]._id);
-  const sockets = users.map((user)=> userSocketIDs.get(user._id.toString()))
 
-  return sockets;
-}
 
 io.on("connection", (socket) => {
     
