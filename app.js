@@ -110,10 +110,10 @@ io.on("connection", (socket) => {
 
     const membersSocket = getSockets(members);
     console.log(membersSocket)
-    io.to(membersSocket).emit(NEW_MESSAGE,{chatId, message:realTimeMessage});
+    io.to(membersSocket).emit(NEW_MESSAGE,{chatId, message:realTimeMessage,});
     io.to(membersSocket).emit(NEW_MESSAGE_ALERT,{chatId});
 
-    console.log("meesage realtime", realTimeMessage);
+    // console.log("meesage realtime", realTimeMessage);
     try {
         await Message.create(messageForDb);
     } catch (error) {
