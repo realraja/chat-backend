@@ -18,22 +18,22 @@ let dateArray = [
 
 export const CreateGroup = tryCatch(async (req, res, next) => {
   const { name, members } = req.body;
-  console.log(name, members);
-
+  
   const allMembers = [...members || '', req.id];
-
-  await Chat.create({
+  
+  const group = await Chat.create({
       name:name || `Group ${dateArray[0]}/${dateArray[1]}/${dateArray[2]}`,
       imgUrl:['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRog6epfJWr_aK4Q5m5o6OYOGoJAHZMpky4mA&s'],
-    members: allMembers,
-    creator: req.id,
-    admins: [req.id],
-    createdDate: dateArray,
-    groupChat: true,
-  });
-
-  emitEvent(req, ALERT, allMembers, `Welcome to ${name} group`);
-  emitEvent(req, REFETCH_CHATS, members);
+      members: allMembers,
+      creator: req.id,
+      admins: [req.id],
+      createdDate: dateArray,
+      groupChat: true,
+    });
+    
+    emitEvent(req, ALERT, group.members, `Welcome to ${name} group`);
+    // emitEvent(req, REFETCH_CHATS, members);
+    // console.log(name, allMembers);
 
   return res
     .status(200)
