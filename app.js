@@ -10,7 +10,7 @@ import requestRoutes from "./routes/request.js";
 import adminRoutes from "./routes/admin.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
-import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/events.js";
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT, START_OR_STOP_TYPING } from "./constants/events.js";
 import { v4 as uuid } from "uuid";
 import { Message } from "./models/message.js";
 import cors from 'cors'; 
@@ -109,7 +109,7 @@ io.on("connection", (socket) => {
 // console.log(members)
 
     const membersSocket = getSockets(members);
-    console.log(membersSocket)
+    // console.log(membersSocket)
     io.to(membersSocket).emit(NEW_MESSAGE,{chatId, message:realTimeMessage,});
     io.to(membersSocket).emit(NEW_MESSAGE_ALERT,{chatId});
 
@@ -120,6 +120,11 @@ io.on("connection", (socket) => {
         console.log(error);
     }
   });
+
+  socket.on(START_OR_STOP_TYPING,({members,chatId,typing})=>{
+    const membersSocket = getSockets(members);
+    io.to(membersSocket).emit(START_OR_STOP_TYPING,{chatId,typing,user:user._id,name:user.name});
+  })
 
   socket.on("disconnect", () => {
     console.log("user disconnected");
