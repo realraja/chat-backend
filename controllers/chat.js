@@ -56,8 +56,8 @@ export const NewChat = tryCatch(async (req, res, next) => {
     createdDate: dateArray,
   });
 
-  emitEvent(req, ALERT, allMembers, `Welcome to New chat`);
-  emitEvent(req, REFETCH_CHATS, member);
+  emitEvent(req, ALERT, newChat.members, `Welcome to New chat`);
+  // emitEvent(req, REFETCH_CHATS, member);
 
   return res
     .status(200)
