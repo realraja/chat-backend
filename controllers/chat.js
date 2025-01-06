@@ -243,9 +243,9 @@ const attachments = await uploadFiles(files);
   if (!user) return next(new errorHandler('User not found', 404));
   
 
+ const createdAt = new Date().toISOString();
 
-
-  const messageForRealtime = {content:'',attachments,sender:{_id:user._id,name:user.name},chatId};
+  const messageForRealtime = {content:'',attachments,createdAt,sender:{_id:user._id,name:user.name},chatId};
   const messageForDB = {content:'',attachments,sender:user._id,chatId};
   const message = await Message.create(messageForDB);
 
