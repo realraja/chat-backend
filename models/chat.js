@@ -1,46 +1,68 @@
-import mongoose,{ Schema, Types, model } from "mongoose";
+import mongoose, { Schema, Types, model } from "mongoose";
 
-
-
-const chatSchema = new Schema({
-    name:{
-        type: String,
-        required: true,
+const chatSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
     },
     imgUrl: [String],
-    groupChat:{
-        type: Boolean,
-        default: false,
+    groupChat: {
+      type: Boolean,
+      default: false,
     },
-    deleted:{
-        type: Boolean,
-        default: false,
+    lastMsg:{
+        type:String,
+        default:''
     },
-    creator:{
-        type: Types.ObjectId,
-        ref: "User"
+    pendings: [
+      {
+        member: {
+          type: Types.ObjectId,
+          ref: "User",
+          unique: true,
+        },
+        count: {
+          type: Number,
+          default: 0,
+        },
+      }
+    ],
+    deleted: {
+      type: Boolean,
+      default: false,
     },
-    admins:[{
-        type: Types.ObjectId,
-        ref: "User"
-    }],
-    members:[{
+    creator: {
+      type: Types.ObjectId,
+      ref: "User",
+    },
+    admins: [
+      {
         type: Types.ObjectId,
         ref: "User",
-        unique: true
-    }],
-    block_members:[{
+      },
+    ],
+    members: [
+      {
         type: Types.ObjectId,
-        ref: "User"
-    }],
+        ref: "User",
+        unique: true,
+      },
+    ],
+    block_members: [
+      {
+        type: Types.ObjectId,
+        ref: "User",
+      },
+    ],
     dummy_data: [],
     createdAt: {
       type: Date,
       default: Date.now,
     },
     createdDate: [],
+  },
+  { timestamps: true }
+);
 
-},{timestamps: true});
-
-
-export const Chat = mongoose.models.chatSchema || model('Chat',chatSchema);
+export const Chat = mongoose.models.chatSchema || model("Chat", chatSchema);

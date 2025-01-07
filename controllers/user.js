@@ -109,7 +109,7 @@ export const Search = tryCatch(async(req,res,next)=>{
     })
     // const otherMember = members.find(member=>member._id !== req.id);
     if(userChat){
-      return {_id:userChat._id,name,avatar,username,updatedAt,isFriend:true}
+      return {_id:userChat._id,friendId:_id,name,avatar,username,updatedAt,isFriend:true}
     }else{
       // console.log(userChat,_id,name,avatar,username,updatedAt)
       return {_id,name,avatar,username,updatedAt,isFriend:false}

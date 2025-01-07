@@ -14,6 +14,7 @@ import {
   RemoveMembers,
   RenameGroup,
   SendAttachment,
+  deletePendings,
   getMessage,
 } from "../controllers/chat.js";
 import { isAuthenticated } from "../middleware/auth.js";
@@ -80,6 +81,7 @@ app.use(isAuthenticated);
 app.post("/message", SendAttachment); // send attachment test it after okay
 
 app.get("/message/:id", getMessage);
+app.delete("/delete-pending/:id", deletePendings);
 
 //get chat details ,rename,delete
 app.route("/:id").get(GetChatDetails).put(RenameGroup).delete(DeleteGroup);

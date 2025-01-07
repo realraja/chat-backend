@@ -65,17 +65,17 @@ export const NewChat = tryCatch(async (req, res, next) => {
 });
 
 export const GetMyChats = tryCatch(async(req, res, next)=>{
-    const chat  = await Chat.find({members:req.id}).populate('members','name avatar');
+    const chat  = await Chat.find({members:req.id}).populate('members','name avatar lastSeen');
     
     // console.log(chat)
 
-    const modifiedChat = chat.map(({_id,name='',imgUrl,members,updatedAt,groupChat})=>{
+    const modifiedChat = chat.map(({_id,name='',imgUrl,members,updatedAt,groupChat,lastMsg,pendings})=>{
       if(!groupChat){
         const otherMember = members.find(member=>member._id.toString() !== req.id.toString());
         // console.log(members,otherMember,req.id)
-        return {_id,name:otherMember.name,imgUrl:[otherMember.avatar],members,updatedAt,groupChat}
+        return {_id,name:otherMember.name,imgUrl:[otherMember.avatar],members,updatedAt,groupChat,lastMsg,pendings}
       }else{
-        return {_id,name,imgUrl,members,updatedAt,groupChat}
+        return {_id,name,imgUrl,members,updatedAt,groupChat,lastMsg,pendings}
       }
     })
 
@@ -260,7 +260,7 @@ const attachments = await uploadFiles(files);
 
 export const GetChatDetails = tryCatch(async (req,res,next) => {
   if(req.query.populate==='true'){
-    const chat = await Chat.findById(req.params.id).populate("members", "name avatar username");
+    const chat = await Chat.findById(req.params.id).populate("members", "name avatar username lastSeen");
     if(!chat) return next(new errorHandler('chat not found',403));
 
     return res.status(200).json({
@@ -328,6 +328,21 @@ export const getMessage = tryCatch(async(req, res, next)=>{
 
 
   return res.status(200).json({success: true, message:Messages.reverse(),totalPages,totalMessages:Messages.length,page})
+
+
+})
+export const deletePendings = tryCatch(async(req, res, next)=>{
+  const chatId = req.params.id;
+
+  const chat = await Chat.findById(chatId);
+
+  // console.log(chat);
+  chat.pendings = chat?.pendings.filter(i => i.member.toString() !== req.id.toString());
+  // console.log(chat);
+  await chat.save();
+
+
+  return res.status(200).json({success: true, message:'Pending Messages Deleted successfully!'})
 
 
 })
