@@ -352,16 +352,16 @@ export const checkIsFriend = tryCatch(async(req, res, next)=>{
   const userId = req.params.id;
 
  
-  const isFriendCheck = Chat.findOne({groupChat:false,
+  const isFriendCheck = await Chat.findOne({groupChat:false,
     $and:[
         {members: req.id},
         {members: userId},
     ]
   })
 
+// console.log(isFriendCheck)
 
-
-  return res.status(200).json({success: true, message:'Pending Messages Deleted successfully!',data:{isFriend: isFriendCheck?true:false}});
+  return res.status(200).json({success: true, message:'Pending Messages Deleted successfully!',data:{isFriend: isFriendCheck?true:false,chatId:isFriendCheck?._id}});
 
 
 })
