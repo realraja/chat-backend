@@ -14,6 +14,7 @@ import {
   RemoveMembers,
   RenameGroup,
   SendAttachment,
+  checkIsFriend,
   deletePendings,
   getMessage,
 } from "../controllers/chat.js";
@@ -85,5 +86,6 @@ app.delete("/delete-pending/:id", deletePendings);
 
 //get chat details ,rename,delete
 app.route("/:id").get(GetChatDetails).put(RenameGroup).delete(DeleteGroup);
+app.route("/check-friend/:id").get(checkIsFriend);
 
 export default app;
